@@ -22,10 +22,10 @@ namespace UdemyEFCore.databaseFirst.DAL
             
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
-        {
-            var builder = optionsBuilder.UseSqlServer
-                (DbContextInitializer.configuration.GetConnectionString("SqlConnectionString"));
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+        //{
+        //    var builder = optionsBuilder.UseSqlServer
+        //        (DbContextInitializer.configuration.GetConnectionString("SqlConnectionString"));
+        //}
     }
 }

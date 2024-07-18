@@ -16,5 +16,21 @@ namespace UdemyEFCore.CodeFirst.DAL
             Initializer.Initialize();
             optionsBuilder.UseSqlServer(Initializer.configuration.GetConnectionString("SqlConnectionString"));
         }
+
+        public override int SaveChanges()
+        {
+            ChangeTracker.Entries().ToList().ForEach(e =>
+            {
+                if (e.Entity is Product product)
+                {
+                    if (e.State==EntityState.Added)
+                    {
+                        product.CreatedTime=DateTime.Now;
+                    }
+                }
+
+            });
+            return base.SaveChanges();
+        }
     }
 }

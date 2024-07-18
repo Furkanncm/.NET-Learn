@@ -7,10 +7,115 @@ using UdemyEFCore.CodeFirst.DAL;
 using (var context = new AppDbContext())
 // her AppDbContext nesnesi oluşturulduğunda veritabanı bağlantısı açılır ve nesne işi bitince kapatılır
 {
-    var Names= await context.MyProducts.Select(p => p.Name).ToListAsync();
+
+    //await _WriteAllProductsAsync(context);
+    //await  _ProductAddAsync(context);
+    //await _ProductRemoveAsync(context);
+    //await _AddProductAsync(context);
+    //await _ChangeTrackerAsync(context);
+    await _ChangeTrackerWithAddProduct(context);
+
+}
+
+async Task _ChangeTrackerAsync(AppDbContext context)
+{
+    await context.MyProducts.ToListAsync(); // MyProducts tablosundaki tüm verileri getir
+
+    context.ChangeTracker.Entries().ToList().ForEach(e => // ChangeTracker ile takip edilen tüm entityleri döngüye al
+    {
+        if (e.Entity is Product MyProduct) // Eğer entity Product ise MyProduct'a ata
+        {
+            MyProduct.Price=10000;
+            context.SaveChanges(); // Veri tabanını güncelle
+            Console.WriteLine($"{MyProduct.Id}->{MyProduct.Name} : {MyProduct.Description} : State -> {e.State}");
+        }
+    });
+}
+async Task _WriteAllProductsAsync(AppDbContext context)
+{
+    var products = await context.MyProducts.AsNoTracking().ToListAsync(); 
+    // AsNoTracking -> Veritabanından veri çekilirken takip etme memoryi verimli kullan.
+
+    foreach (var product in products)
+    {
+        var state = context.Entry(product).State;
+        Console.WriteLine($"{product.Id}->{product.Name} : {product.Description} : State -> {state}");
+    }
+
+
+
+    var Names = await context.MyProducts.Select(p => p.Name).ToListAsync();
     // MyProducts tablosundan Name alanını al ve listeye çevir
 
     Names.ForEach(n => Console.WriteLine(n));
     // Name'lerin olduğu listeyi ekrana yazdır
+}
+async Task _ProductAddAsync(AppDbContext context)
+{
+    var newProduct = new Product
+    {
+        Name = "Samsung S5",
+        Description = "2015 Model Telefon",
+        Price = 2000,
+        Stock = 50,
+        Barcode= 123456789
+    };
+    Console.WriteLine(context.Entry(newProduct).State); // State -> Detached Henüz memoryde değil ve veritabanında yok
+
+    await context.MyProducts.AddAsync(newProduct);
+
+    Console.WriteLine(context.Entry(newProduct).State); // State -> Added memoryde var ama veritabanında yok
+
+    await context.SaveChangesAsync();
+
+    Console.WriteLine(context.Entry(newProduct).State); // State -> Unchanged Veri tabanıyla eşleşti
+
+}
+async Task _ProductRemoveAsync(AppDbContext context)
+{
+    var specialProduct = await context.MyProducts.FirstAsync();
+    Console.WriteLine(context.Entry(specialProduct).State); // State -> Unchanged
+    specialProduct.Price = 1000;
+    Console.WriteLine(context.Entry(specialProduct).State); // State -> Modified
+    await context.SaveChangesAsync();
+    Console.WriteLine(context.Entry(specialProduct).State); // State -> Unchanged veri tabanındaki veri ile eşleştiği için
+    context.Remove(specialProduct);
+    Console.WriteLine(context.Entry(specialProduct).State); // State -> Deleted
+    await context.SaveChangesAsync();
+    Console.WriteLine(context.Entry(specialProduct).State); // State -> Detached veritabanından silindiği için
+
+
+}
+
+async Task _AddProductAsync(AppDbContext context)
+{
+    var newProduct = new Product
+    {
+        Name = "Samsung S6",
+        Description = "2016 Model Telefon",
+        Price = 3000,
+        Stock = 100,
+        Barcode = 123456789,
+        CreatedTime= DateTime.Now
+    };
+
+    context.MyProducts.Add(newProduct);
+    context.SaveChanges();
+}
+
+async Task _ChangeTrackerWithAddProduct(AppDbContext context)
+{
+    var product = new Product
+    {
+        Name="Samsung S8",
+        Description="2018 Model Telefon",
+        Price=5000,
+        Stock=400,
+        Barcode=11356789
+    };
+
+    await context.MyProducts.AddAsync(product);
+
+    context.SaveChanges();
 
 }
