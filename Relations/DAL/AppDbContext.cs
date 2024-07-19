@@ -28,6 +28,16 @@ namespace Relations.DAL
             optionsBuilder.UseSqlServer(Initializerr.Configuration.GetConnectionString("SqlConnectionString"));
         }
 
-        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Product>()
+                .HasOne(x => x.Category)
+                .WithMany(x => x.Products)
+                .HasForeignKey(x => x.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+            base.OnModelCreating(modelBuilder);
+        }
+
+
     }
 }
