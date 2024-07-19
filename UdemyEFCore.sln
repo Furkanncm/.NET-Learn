@@ -5,11 +5,13 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UdemyEFCore.databaseFirst", "UdemyEFCore.databaseFirst\UdemyEFCore.databaseFirst.csproj", "{800ABA3A-827A-4422-AB07-F398B8A08C25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdemyEFCore.databaseFirstByScaffold", "UdemyEFCore.databaseFirstByScaffold\UdemyEFCore.databaseFirstByScaffold.csproj", "{8A11C2FE-948C-4095-ABB6-0CAAD3B5B7B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UdemyEFCore.databaseFirstByScaffold", "UdemyEFCore.databaseFirstByScaffold\UdemyEFCore.databaseFirstByScaffold.csproj", "{8A11C2FE-948C-4095-ABB6-0CAAD3B5B7B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{B3448656-7303-49C1-8FFB-530CED7FC01A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{B3448656-7303-49C1-8FFB-530CED7FC01A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdemyEFCore.CodeFirst", "UdemyEFCore.CodeFirst\UdemyEFCore.CodeFirst.csproj", "{D3D1AE94-926D-4476-9F76-FFECA68CB258}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UdemyEFCore.CodeFirst", "UdemyEFCore.CodeFirst\UdemyEFCore.CodeFirst.csproj", "{D3D1AE94-926D-4476-9F76-FFECA68CB258}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Relations", "Relations\Relations.csproj", "{D56ED628-3000-4D85-8C96-486BB116F22B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{D3D1AE94-926D-4476-9F76-FFECA68CB258}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3D1AE94-926D-4476-9F76-FFECA68CB258}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3D1AE94-926D-4476-9F76-FFECA68CB258}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D56ED628-3000-4D85-8C96-486BB116F22B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D56ED628-3000-4D85-8C96-486BB116F22B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D56ED628-3000-4D85-8C96-486BB116F22B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D56ED628-3000-4D85-8C96-486BB116F22B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
