@@ -9,14 +9,16 @@ using System.Threading.Tasks;
 namespace UdemyEFCore.CodeFirst.DAL
 {
     //Product Modelimize ait özellikleri tanımladık
-   //  [Table("MyProducts")]  Tablo ismi böyle de verilebilir.
+    [Table("MyProducts")] // Tablo ismi böyle de verilebilir.
     public class Product
     {
-        [Key]
+        //[Key]
         public int Id { get; set; }
-        [Required,StringLength (100,MinimumLength =10)] // Validation yapılacak ise kullanılabilir.
+
+       // [Required,StringLength (100,MinimumLength =10)] // Validation yapılacak ise kullanılabilir.
         public string Name { get; set; }
-        [Required , MaxLength(200)]
+
+        //[Required , MaxLength(200)]
         public string? Description { get; set; }
         public decimal? Price { get; set; }
         public int? Stock { get; set; }
@@ -24,6 +26,13 @@ namespace UdemyEFCore.CodeFirst.DAL
         public DateTime? CreatedTime { get; set; }
 
         public int? Barcode { get; set; }
+
+        //  public ProductFeature ProductFeature { get; set; }
+
+        public int CategoryId { get; set; } // Foreign Key
+
+        // Navigation Property 
+        public Category Category { get; set; }
 
     }
 }

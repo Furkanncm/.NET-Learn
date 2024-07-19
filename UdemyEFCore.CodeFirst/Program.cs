@@ -8,20 +8,114 @@ using UdemyEFCore.CodeFirst.DAL;
 using (var context = new AppDbContext())
 // her AppDbContext nesnesi oluşturulduğunda veritabanı bağlantısı açılır ve nesne işi bitince kapatılır
 {
-
+    _OneToManyAdd(context);
     //await _ChangeTrackerAsync(context);
     //await _WriteAllProductsAsync(context);
-   // await  _ProductAddAsync(context);
+    // await  _ProductAddAsync(context);
     //await _ProductRemoveAsync(context);
-    //await _AddProductAsync(context);
-
+    //await _A ddProductAsync(context);
     // await _ChangeTrackerWithAddProduct(context);
-     //await _UpdateProduct(context);
+    //await _UpdateProduct(context);
     //await _DbSetProp(context);
-
 
 }
 
+
+void _existanceCheck(AppDbContext context, Category category)
+{
+    var existingProducts= context.MyProducts.FirstOrDefault(p=>p.Name=="Steel Series");
+
+    if(existingProducts == null) // ürün yoksa ekle varsa kullanıcıyı bildir.
+    {
+        category.Products.Add(new Product
+        {
+            Name= "Steel Series",
+            Description="Steel Series Mouse",
+            Price=100,
+            Barcode=123456789,
+            Stock=100
+        });
+    }
+    else
+    {
+        Console.WriteLine("Logitech Mouse ürünü zaten var");
+    }
+
+}
+void _OneToManyAdd(AppDbContext context)
+{ //var telefonCategory = new Category {Name= "Telefon", Description="Telefon Kategorisi"};
+    
+    var existingCategory= context.Categories.FirstOrDefault(c=>c.Name=="Mouse");
+    if (existingCategory == null)
+    {
+        var mouseCategory = new Category
+        {
+            Name= "Mouse",
+            Description="Mouse Kategorisi"
+        };
+        context.Categories.Add(mouseCategory);
+        _existanceCheck(context,mouseCategory);
+        
+        //Console.WriteLine("if e girdi");
+    }
+    else
+    {
+       _existanceCheck(context,existingCategory);
+       // Console.WriteLine("else girdi");
+    }
+    
+    context.SaveChanges();
+
+    
+    context.SaveChanges();
+    //var product = new Product
+    // {
+    //     Name = "Samsung S10",
+    //     Description = "2019 Model Telefon",
+    //     Price = 8000,
+    //     Stock = 100,
+    //     Barcode = 123456789,
+    //     Category=telefonCategory
+    // };
+
+    // telefonCategory.Products.Add(new Product()
+    // {
+    //     Name = "Samsung S21",
+    //     Description = "2021 Model Telefon",
+    //     Price = 8000,
+    //     Stock = 100,
+    //     Barcode = 123456789,
+
+    // });
+
+    //laptopCategory.Products.Add(new Product()
+    //{
+    //    Name= "Monster Abra A7",
+    //    Description="Monster Laptop",
+    //    Price=20000,
+    //    Stock=50,
+    //    Barcode=123933789
+
+    //});
+
+    //laptopCategory.Products.Add(new Product()
+    //{
+    //    Name="Monster Abra A6",
+    //    Description="Monster Laptop",
+    //    Price=15000,
+    //    Stock=50,
+    //    Barcode=123933789
+
+
+    //});
+
+    //context.Categories.Add(laptopCategory);
+    //  context.Categories.Add(telefonCategory);
+
+    // context.MyProducts.Add(product);
+
+
+}
 async Task _ChangeTrackerAsync(AppDbContext context)
 {
     await context.MyProducts.ToListAsync(); // MyProducts tablosundaki tüm verileri getir
@@ -153,17 +247,18 @@ async Task _DbSetProp(AppDbContext context)
     var message = context.Entry(product1).State;
     Console.WriteLine(message);
 
-    var products = await context.MyProducts.Where(e => e.Price > 2000).ToListAsync(); // Where filtreleme yapar geriye liste döndürür.
+    var products = await context.MyProducts.Where(e => e.Price > 2000).ToListAsync(); 
+    // Where filtreleme yapar geriye liste döndürür.
     foreach (var p in products)
     {
         Console.WriteLine(p.Description);
     }
 
     var product2 = context.MyProducts.SingleAsync(e => e.Id==6);
-    // SingleAsync sorgusu sonucunda tek bir veri döner. Bulamadığında hata fırlatsın istersek SingleAsync kullanırız.
+    // SingleAsync sorgusu sonucunda tek bir veri döner. Bulamadığında hata fırlatsın istersek Single kullanırız.
     Console.WriteLine(product2.Result.Name);
     var product3 = context.MyProducts.Find(6);
-
+    Console.WriteLine(product3.Name);
     // Find metodu o tablonun primary keyine göre veri getirir ekstradan belirmeye gerek yoktur. Bulamazsa null döndürür.
 
 
