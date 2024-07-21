@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Relations.DAL
         public DbSet<Product> Products { get; set; }
 
         public DbSet<Category> Categories { get; set; }
+
+        public DbSet<ProdcutFeature> ProdcutFeatures { get; set; }
 
         public DbSet<Book> Books { get; set; }
 
@@ -30,11 +33,12 @@ namespace Relations.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Product>()
-                .HasOne(x => x.Category)
-                .WithMany(x => x.Products)
-                .HasForeignKey(x => x.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<Product>()
+            //    .HasOne(x => x.Category)
+            //    .WithMany(x => x.Products)
+            //    .HasForeignKey(x => x.CategoryId)
+            //    .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>().Property(x => x.PriceKdv).HasComputedColumnSql("[Price]*[KDV]");
             base.OnModelCreating(modelBuilder);
         }
 
