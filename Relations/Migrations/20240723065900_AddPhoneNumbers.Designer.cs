@@ -12,8 +12,8 @@ using Relations.DAL;
 namespace Relations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240721094538_inital2")]
-    partial class inital2
+    [Migration("20240723065900_AddPhoneNumbers")]
+    partial class AddPhoneNumbers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,9 +35,21 @@ namespace Relations.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "Nickname" });
+
+                    b.HasIndex("Nickname");
+
+                    b.HasIndex("Name", "Nickname");
 
                     b.ToTable("Authors");
                 });
@@ -85,6 +97,60 @@ namespace Relations.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Relations.DAL.Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Salary")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("Relations.DAL.Manager", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Managers");
+                });
+
+            modelBuilder.Entity("Relations.DAL.PhoneNumber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PhoneNumbers");
+                });
+
             modelBuilder.Entity("Relations.DAL.ProdcutFeature", b =>
                 {
                     b.Property<int>("Id")
@@ -111,6 +177,9 @@ namespace Relations.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Barcode")
+                        .HasColumnType("int");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -118,12 +187,15 @@ namespace Relations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DiscountPrice")
+                        .HasColumnType("int");
+
                     b.Property<int>("KDV")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Price")
                         .HasColumnType("int");
@@ -137,7 +209,37 @@ namespace Relations.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products");
+                    b.HasIndex("Name");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "Price", "Barcode" });
+
+                    b.ToTable("Products", t =>
+                        {
+                            t.HasCheckConstraint("DiscountCheck", "[Price]>[DiscountPrice]");
+                        });
+                });
+
+            modelBuilder.Entity("Relations.DAL.ProductFulls", b =>
+                {
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Product_Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("ProductFulls");
                 });
 
             modelBuilder.Entity("Relations.DAL.Student", b =>
@@ -198,6 +300,66 @@ namespace Relations.Migrations
                         .IsRequired();
 
                     b.Navigation("Authors");
+                });
+
+            modelBuilder.Entity("Relations.DAL.Employee", b =>
+                {
+                    b.OwnsOne("Relations.DAL.Person", "Person", b1 =>
+                        {
+                            b1.Property<int>("EmployeeId")
+                                .HasColumnType("int");
+
+                            b1.Property<DateTime>("BirthDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Surname")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("EmployeeId");
+
+                            b1.ToTable("Employees");
+
+                            b1.WithOwner()
+                                .HasForeignKey("EmployeeId");
+                        });
+
+                    b.Navigation("Person")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Relations.DAL.Manager", b =>
+                {
+                    b.OwnsOne("Relations.DAL.Person", "Person", b1 =>
+                        {
+                            b1.Property<int>("ManagerId")
+                                .HasColumnType("int");
+
+                            b1.Property<DateTime>("BirthDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Surname")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("ManagerId");
+
+                            b1.ToTable("Managers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ManagerId");
+                        });
+
+                    b.Navigation("Person")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Relations.DAL.ProdcutFeature", b =>

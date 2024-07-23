@@ -5,28 +5,23 @@
 namespace Relations.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class AddPhoneNumbers : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ProdcutFeatures",
+                name: "PhoneNumbers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProdcutFeatures", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProdcutFeatures_Products_Id",
-                        column: x => x.Id,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_PhoneNumbers", x => x.Id);
                 });
         }
 
@@ -34,7 +29,7 @@ namespace Relations.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProdcutFeatures");
+                name: "PhoneNumbers");
         }
     }
 }

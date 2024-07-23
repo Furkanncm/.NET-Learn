@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Relations.DAL
 {
-    public class Category
+    public class PhoneNumber
     {
         public int Id { get; set; }
+
         public string Name { get; set; }
-        public List<Product> Products { get; set; } = new List<Product>();
+        public string Number { get; set; }
+
     }
 }

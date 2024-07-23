@@ -38,6 +38,52 @@ namespace Relations.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Employees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Salary = table.Column<int>(type: "int", nullable: false),
+                    Person_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Person_Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Person_BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Managers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Department = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Person_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Person_Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Person_BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Managers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductFulls",
+                columns: table => new
+                {
+                    Product_Id = table.Column<int>(type: "int", nullable: false),
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -92,8 +138,9 @@ namespace Relations.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
+                    Barcode = table.Column<int>(type: "int", nullable: false),
                     KDV = table.Column<int>(type: "int", nullable: false),
-                    PriceKdv = table.Column<int>(type: "int", nullable: false),
+                    PriceKdv = table.Column<int>(type: "int", nullable: false, computedColumnSql: "[Price]*[KDV]"),
                     CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -132,6 +179,25 @@ namespace Relations.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProdcutFeatures",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProdcutFeatures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProdcutFeatures_Products_Id",
+                        column: x => x.Id,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Books_AuthorId",
                 table: "Books",
@@ -156,7 +222,16 @@ namespace Relations.Migrations
                 name: "Books");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "Managers");
+
+            migrationBuilder.DropTable(
+                name: "ProdcutFeatures");
+
+            migrationBuilder.DropTable(
+                name: "ProductFulls");
 
             migrationBuilder.DropTable(
                 name: "StudentTeacher");
@@ -165,13 +240,16 @@ namespace Relations.Migrations
                 name: "Authors");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Students");
 
             migrationBuilder.DropTable(
                 name: "TheacerList");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
         }
     }
 }

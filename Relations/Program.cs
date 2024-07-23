@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Relations;
 using Relations.DAL;
+using System.Security.Cryptography.X509Certificates;
 
 Initializerr.Initialize();
-using (var context= new AppDbContext())
+using (var context = new AppDbContext())
 {
     // _AddCategory(context);
     //context.SaveChanges();
@@ -11,11 +12,278 @@ using (var context= new AppDbContext())
     //_AddToMany(context);
     //_removeItem(context);
     //_eagerLoading(context);
-    _explictLoading(context);
+    // _explictLoading(context);
+    //_tablePerHierarchy(context);
+    //_keyless(context);
+    //_indexes(context);
+    //_clientAndServerSide(context);
+    //_innerJoin(context);
+    //_leftJoin(context);
+
+
+
+    
+
+   
+
 
 }
 
+void _outerJoin(AppDbContext context)
+{
+    newJoinItem item = new newJoinItem("None", "None", 0);
 
+    var response = _rightJoin(context, item);
+    response.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.ProductPrice}");
+    });
+
+    Console.WriteLine("-------------");
+    newJoinItem newJoinItem = new newJoinItem("None", "None", 0);
+
+    var result = _leftJoin(context, newJoinItem);
+    result.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.ProductPrice}");
+    });
+    Console.WriteLine("---------------------+");
+    var outerJoin = response.Union(result).ToList();
+    outerJoin.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.ProductPrice}");
+    });
+
+}
+List<newJoinItem> _rightJoin(AppDbContext context, newJoinItem item)
+{
+    var rightJoin = (from c in context.Categories
+                     join p in context.Products on c.Id equals p.CategoryId into proList
+                     from productList in proList.DefaultIfEmpty()
+                     select new newJoinItem  (
+                      c.Name,
+                      productList != null ? productList.Name : null,
+                     productList != null ? (int?)productList.Price : null
+                     )).ToList();
+
+    return rightJoin;
+}
+
+List<newJoinItem> _leftJoin(AppDbContext context, newJoinItem item)
+{
+    var leftJoin = (from p in context.Products
+                    join c in context.Categories on p.CategoryId equals c.Id into categoryList
+                    from category in categoryList.DefaultIfEmpty()
+                        select new newJoinItem(
+                        category != null ? category.Name : null,
+                        p.Name,
+                        p.Price
+                        )
+                    ).ToList();
+    return leftJoin;
+}
+
+void _innerJoin(AppDbContext context)
+{
+    var result = context.Categories.Join(context.Products, c => c.Id, p => p.CategoryId, (c, p) => new
+    {
+        CategoryName = c.Name,
+        ProductName = p.Name,
+        ProductPrice = p.Price
+    }).ToList();
+
+    result.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.ProductPrice}");
+    });
+    Console.WriteLine("---------------------------------------------------");
+
+    var result2 = (from c in context.Categories
+                   join p in context.Products on c.Id equals p.CategoryId
+                   select new
+                   {
+                       CategoryName = c.Name,
+                       ProductName = p.Name,
+                       ProductPrice = p.Price
+                   }).ToList();
+
+    result2.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.ProductPrice}");
+    });
+
+    Console.WriteLine("---------------------------------------------------");
+
+    var productResult = context.Products
+        .Join(context.Categories, p => p.CategoryId, c => c.Id, (p, c) => new
+        { c, p })
+        .Join(context.ProdcutFeatures, x => x.p.Id, pf => pf.Id, (x, pf) => new
+        {
+            CategoryName = x.c.Name,
+            ProductName = x.p.Name,
+            PfName = pf.Name
+        }).ToList();
+
+    productResult.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.PfName}");
+    });
+
+    Console.WriteLine("---------------------------------------------------");
+
+    var productResult2 = (from p in context.Products
+                          join c in context.Categories on p.CategoryId equals c.Id
+                          join pf in context.ProdcutFeatures on p.Id equals pf.Id
+                          select new
+                          {
+                              Value = pf.Value,
+                              CategoryName = c.Name,
+                              ProductName = p.Name
+                          }).ToList();
+
+    productResult2.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.Value}");
+    });
+}
+
+void _clientAndServerSide(AppDbContext context)
+{
+
+    //context.PhoneNumbers.AddRange(new PhoneNumber
+    //{
+    //    Name = "Furkan",
+    //    Number = "1234567890"
+    //},
+    //new PhoneNumber
+    //{
+    //    Name = "Betül",
+    //    Number = "9876543210"
+    //}
+    //); 
+
+
+    //CLIENT AND SERVER SIDE    
+    //ToList metodu dahil oraya kadar Server tarafında çalışır.
+    //ToList metodu sonrası Client tarafında çalışır.
+    var Numbers = context.PhoneNumbers.ToList().Select(x => new
+    {
+        numberWithoutZero = formatPhone(x.Number)
+    }).ToList();
+
+    Numbers.ForEach(e =>
+    {
+        Console.WriteLine(e.numberWithoutZero);
+    });
+    context.SaveChanges();
+}
+
+String formatPhone(String value)
+{
+    return value.Substring(1, value.Length-1);
+}
+
+void _indexes (AppDbContext context)
+{
+
+    //Selectdeki veriler mesela Nickname özelliği IncludeProperty ile dahil edilmeli.
+    //Edilmez ise Index'ın bir anlamı olmaz.Çünkü tabloya bir kez daha sorgu atılır.
+    //context.Authors.Where(x => x.Name=="Author 2").Select(x => new { newName = x.Name, newNickname = x.Nickname });
+    //context.Products.Where(x => x.Name == "Product 4").Select(x=> new
+    //{
+    //    // Bu 3 özellik IncludeProperty ile dahil edildiği için sadece name sorgusu ile bu özellikler de çekilir.
+    //    newName=x.Name,
+    //    newPrice=x.Price,
+    //    newBarcode=x.Barcode
+    //});
+
+    context.Products.Add(new Product
+    {
+        Name = "Product 4",
+        Price = 100,
+        KDV = 18,
+        Barcode = 123456,
+        DiscountPrice= 50,
+        ProdcutFeature = new ProdcutFeature
+        {
+            Name = "Feature 4",
+            Value = "Value 4"
+        },
+        Category = new Category
+        {
+            Name = "Category 4"
+        }
+
+    });
+    context.SaveChanges();
+}
+
+//Keyless entitylerde data eklenmez fakat veri çekilebilir ve okunabilir.
+void _keyless(AppDbContext context)
+{
+    //context.Categories.Add(new Category
+    //{
+    //    Name = "Category 4",
+    //    Products = new List<Product>
+    //    {
+    //        new Product
+    //        {
+    //            Name = "Product 1",
+    //            Price = 100,
+    //            KDV = 18,
+    //            ProdcutFeature = new ProdcutFeature
+    //            {
+    //                Name = "Feature 1",
+    //                Value = "Value 1"
+    //            }
+    //        },
+    //        new Product
+    //        {
+    //            Name = "Product 2",
+    //            Price = 200,
+    //            KDV = 18,
+    //            ProdcutFeature = new ProdcutFeature
+    //            {
+    //                Name = "Feature 2",
+    //                Value = "Value 2"
+    //            },
+    //        } }
+    //});
+    context.SaveChanges();
+
+    var productFulles = context.ProductFulls.FromSqlRaw(@"select p.Id ""Product_Id"", c.Name ""CategoryName"" ,p.Name ""ProductName"",p.Price,pf.Value from Products p
+join Categories c on p.CategoryId=c.Id
+join ProdcutFeatures pf on p.Id=pf.Id").ToList();
+    Console.WriteLine(productFulles.Count);
+    productFulles.ForEach(
+        e =>
+        {
+
+            Console.WriteLine($"{e.Product_Id} {e.CategoryName} {e.ProductName} {e.Price} {e.Value}");
+        });
+}
+void _tablePerHierarchy(AppDbContext context)
+{
+    //var employee = context.Employees.Add(new Employee
+    //{
+    //    Name = "Employee 2",
+    //    Surname = "Surname 2",
+    //    Salary = 1000
+
+
+    //});
+    //var manager = context.Managers.Add(new Manager
+    //{
+    //    Name = "Manager 2",
+    //    Surname = "Surname 2",
+    //    Department = "IT"
+    //});
+
+    //context.SaveChanges();
+
+
+    
+}
 
 // ilk başta değilde sonradan eklenen bir tablo için kullanılır.
 void _explictLoading(AppDbContext context)
@@ -95,7 +363,6 @@ void _eagerLoading(AppDbContext context)
     //    }
 
     foreach (var pfItem in categoreyWithProducts.Products)
-    // Select ile ProductFeature tablosundan veri çekilir.
     {
         Console.WriteLine($"{pfItem.Name}: {pfItem.ProdcutFeature.Value}");
     }
