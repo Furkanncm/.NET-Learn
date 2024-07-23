@@ -12,8 +12,8 @@ using Relations.DAL;
 namespace Relations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240723065900_AddPhoneNumbers")]
-    partial class AddPhoneNumbers
+    [Migration("20240723115633_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -274,6 +274,18 @@ namespace Relations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TheacerList");
+                });
+
+            modelBuilder.Entity("Relations.DAL.xd", b =>
+                {
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.ToTable("xds");
                 });
 
             modelBuilder.Entity("StudentTeacher", b =>

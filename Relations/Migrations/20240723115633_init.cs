@@ -17,7 +17,8 @@ namespace Relations.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Nickname = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,6 +71,20 @@ namespace Relations.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PhoneNumbers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhoneNumbers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductFulls",
                 columns: table => new
                 {
@@ -110,6 +125,17 @@ namespace Relations.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "xds",
+                columns: table => new
+                {
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Books",
                 columns: table => new
                 {
@@ -136,8 +162,9 @@ namespace Relations.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
+                    DiscountPrice = table.Column<int>(type: "int", nullable: false),
                     Barcode = table.Column<int>(type: "int", nullable: false),
                     KDV = table.Column<int>(type: "int", nullable: false),
                     PriceKdv = table.Column<int>(type: "int", nullable: false, computedColumnSql: "[Price]*[KDV]"),
@@ -147,6 +174,7 @@ namespace Relations.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                    table.CheckConstraint("DiscountCheck", "[Price]>[DiscountPrice]");
                     table.ForeignKey(
                         name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -199,6 +227,22 @@ namespace Relations.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Authors_Name",
+                table: "Authors",
+                column: "Name")
+                .Annotation("SqlServer:Include", new[] { "Nickname" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Authors_Name_Nickname",
+                table: "Authors",
+                columns: new[] { "Name", "Nickname" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Authors_Nickname",
+                table: "Authors",
+                column: "Nickname");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Books_AuthorId",
                 table: "Books",
                 column: "AuthorId",
@@ -208,6 +252,12 @@ namespace Relations.Migrations
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Name",
+                table: "Products",
+                column: "Name")
+                .Annotation("SqlServer:Include", new[] { "Price", "Barcode" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentTeacher_TeacherListId",
@@ -228,6 +278,9 @@ namespace Relations.Migrations
                 name: "Managers");
 
             migrationBuilder.DropTable(
+                name: "PhoneNumbers");
+
+            migrationBuilder.DropTable(
                 name: "ProdcutFeatures");
 
             migrationBuilder.DropTable(
@@ -235,6 +288,9 @@ namespace Relations.Migrations
 
             migrationBuilder.DropTable(
                 name: "StudentTeacher");
+
+            migrationBuilder.DropTable(
+                name: "xds");
 
             migrationBuilder.DropTable(
                 name: "Authors");

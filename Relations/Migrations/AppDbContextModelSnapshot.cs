@@ -273,6 +273,18 @@ namespace Relations.Migrations
                     b.ToTable("TheacerList");
                 });
 
+            modelBuilder.Entity("Relations.DAL.xd", b =>
+                {
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.ToTable("xds");
+                });
+
             modelBuilder.Entity("StudentTeacher", b =>
                 {
                     b.Property<int>("StudentsId")

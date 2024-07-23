@@ -19,14 +19,25 @@ using (var context = new AppDbContext())
     //_clientAndServerSide(context);
     //_innerJoin(context);
     //_leftJoin(context);
+    //_sqlRaw(context);
 
 
 
-    
+    var sss = context.Productfulls.ToList();
+    sss.ForEach(e =>
+    {
+        Console.WriteLine($"{e.Category} {e.Product} {e.CreatedTime} {e.Value}");
+    });
 
-   
+}
 
-
+ void _sqlRaw(AppDbContext context)
+{
+    var xdItems =  context.xds.FromSqlRaw("select Name,Price from products").ToList();
+    xdItems.ForEach(e =>
+    {
+        Console.WriteLine($"{e.Name} {e.Price}");
+    });
 }
 
 void _outerJoin(AppDbContext context)
@@ -61,8 +72,8 @@ List<newJoinItem> _rightJoin(AppDbContext context, newJoinItem item)
                      join p in context.Products on c.Id equals p.CategoryId into proList
                      from productList in proList.DefaultIfEmpty()
                      select new newJoinItem  (
-                      c.Name,
-                      productList != null ? productList.Name : null,
+                     c.Name,
+                     productList != null ? productList.Name : null,
                      productList != null ? (int?)productList.Price : null
                      )).ToList();
 
@@ -82,7 +93,6 @@ List<newJoinItem> _leftJoin(AppDbContext context, newJoinItem item)
                     ).ToList();
     return leftJoin;
 }
-
 void _innerJoin(AppDbContext context)
 {
     var result = context.Categories.Join(context.Products, c => c.Id, p => p.CategoryId, (c, p) => new

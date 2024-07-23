@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Relations.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,8 @@ namespace Relations.DAL
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<Productfulls> Productfulls{ get; set; }
         public DbSet<ProductFulls> ProductFulls { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProdcutFeature> ProdcutFeatures { get; set; }
@@ -26,6 +29,10 @@ namespace Relations.DAL
         public DbSet<Teacher> TheacerList { get; set; }
 
         public DbSet<PhoneNumber> PhoneNumbers { get; set; }
+
+        public DbSet<xd> xds { get; set; }
+
+       
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -68,6 +75,8 @@ namespace Relations.DAL
 
             // Keyless entity
             modelBuilder.Entity<ProductFulls>().HasNoKey();
+            modelBuilder.Entity<xd>().HasNoKey();
+         
 
             // Entity Property
             //modelBuilder.Entity<Product>().Property(x=>x.Barcode).IsUnicode(false);
@@ -87,6 +96,9 @@ namespace Relations.DAL
 
             modelBuilder.Entity<Product>().HasCheckConstraint("DiscountCheck", "[Price]>[DiscountPrice]");
            
+            modelBuilder.Entity<Productfulls>().HasNoKey();
+            modelBuilder.Entity<Productfulls>().ToView("furkanView");
+
             base.OnModelCreating(modelBuilder);
         }
 
