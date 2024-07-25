@@ -19,6 +19,8 @@ namespace Relations.DAL
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<ProductEssential> ProductEssentials { get; set; }
+
         public DbSet<Productfulls> Productfulls{ get; set; }
         public DbSet<ProductFulls> ProductFulls { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -32,7 +34,9 @@ namespace Relations.DAL
 
         public DbSet<xd> xds { get; set; }
 
-       
+        public DbSet<Example> Examples { get; set; }
+
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -73,10 +77,11 @@ namespace Relations.DAL
             //    p.Property(x => x.BirthDate).HasColumnName("ManagerBirthDate");
             //});
 
-            // Keyless entity
+            // Keyless entity : ekleme ve güncelleme işlemleri yapılamaz. Bir bakıma entity değil modeldir.
             modelBuilder.Entity<ProductFulls>().HasNoKey();
             modelBuilder.Entity<xd>().HasNoKey();
-         
+            modelBuilder.Entity<Example>().HasNoKey();
+          //  modelBuilder.Entity<ProductEssential>().HasNoKey();
 
             // Entity Property
             //modelBuilder.Entity<Product>().Property(x=>x.Barcode).IsUnicode(false);
@@ -98,6 +103,8 @@ namespace Relations.DAL
            
             modelBuilder.Entity<Productfulls>().HasNoKey();
             modelBuilder.Entity<Productfulls>().ToView("furkanView");
+
+            modelBuilder.Entity<ProductEssential>().ToFunction("fn_functionFurkan");
 
             base.OnModelCreating(modelBuilder);
         }

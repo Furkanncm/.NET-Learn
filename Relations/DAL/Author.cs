@@ -15,7 +15,7 @@ namespace Relations.DAL
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public String Nickname { get; set; }
+        public string Nickname { get; set; }
         public Book Books { get; set; }
     }
 }

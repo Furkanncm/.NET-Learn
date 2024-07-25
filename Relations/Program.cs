@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Relations;
 using Relations.DAL;
+using Relations.DTOs;
 using System.Security.Cryptography.X509Certificates;
 
 Initializerr.Initialize();
@@ -20,18 +21,119 @@ using (var context = new AppDbContext())
     //_innerJoin(context);
     //_leftJoin(context);
     //_sqlRaw(context);
+    //_storeProcedure(context);
+    //_anonymousType(context);
+    //await _DTO(context);
+
+   
+
+}
 
 
-
-    var sss = context.Productfulls.ToList();
-    sss.ForEach(e =>
+async Task _DTO(AppDbContext context)
+{
+    var response = context.Categories.Select(c => new FirstDTO
     {
-        Console.WriteLine($"{e.Category} {e.Product} {e.CreatedTime} {e.Value}");
+        CategoryName = c.Name,
+        TotalPrice = c.Products.Sum(p => p.Price),
+        TotalKdv = c.Products.Sum(p => p.PriceKdv),
+    });
+
+    await response.ForEachAsync(e =>
+    {
+        Console.WriteLine($"{e.CategoryName} => {e.TotalPrice} : {e.TotalKdv} -->{e.CreatedTime}");
+    });
+}
+void _anonymousType(AppDbContext context) 
+{
+    //Anonymous Types Select ile isimsiz bir model oluşturulur.
+    //var response = await context.Products.Include(e => e.ProdcutFeature).Include(e => e.Category).Select(e => new
+    //{
+    //    CategoryName = e.Category.Name,
+    //    ProductName = e.Name,
+    //    ProductPrice = e.Price,
+    //    ProductFeature = e.ProdcutFeature.Value
+    //}).Where(e => e.ProductPrice > 100).ToListAsync();
+
+    //response.ForEach(e =>
+    //{
+    //    Console.WriteLine($"{e.CategoryName} => {e.ProductName} : {e.ProductPrice} : {e.ProductFeature}");
+    //});
+
+    // Sum ve Join işlemleri
+    var result =  context.Categories.Select(o => new
+    {
+        //Select kullanıldığında isimsiz bir model oluşturulur.
+        // Bağlı diğer tablolardan veri çekilirken Include kullanmaya gerek kalmaz Navigasyon propertyler ile çekilir.
+        CategorName = o.Name,
+        TotalPrice = o.Products.Sum(t => t.Price), // Aynı kategorideki ürünlerin toplam fiyatı
+        TotalKdv = o.Products.Sum(k => k.PriceKdv), // Aynı kategorideki ürünlerin toplam KDV'li fiyatı
+        AllNames = String.Join(",", o.Products.Select(n => n.Name)) // Aynı kategorideki ürünlerin isimleri
+
+    }).Where(c => c.TotalKdv>3000).ToList();
+
+    result.ForEach(e =>
+    {
+        Console.WriteLine($"{e.CategorName} => {e.TotalPrice} : {e.TotalKdv}");
+        Console.WriteLine(e.AllNames);
+    });
+}
+
+void _storeProcedure(AppDbContext context)
+{
+
+    //var response= context.Examples.FromSqlRaw("exec YalinProcedure").ToList();
+
+    //response.ForEach(e =>
+    //{
+
+    //   Console.WriteLine($"{e.Category} => {e.Name} {e.Price} {e.Barcode}");
+    //});
+
+    //var result = await context.Examples.FromSqlInterpolated($"exec YalinProcedure {2}").ToListAsync();
+
+    //result.ForEach(e =>
+    //{
+    //    Console.WriteLine($"{e.Category} => {e.Name} {e.Price} {e.Barcode}");
+    //});
+
+
+
+    //var response = await context.Products.FromSqlRaw("exec get_all_Product").ToListAsync();
+
+    //response.ForEach(e =>
+    //{
+    //    Console.WriteLine($"{e.Name} {e.Price} {e.CreatedTime}");
+    //});
+
+    //var result= await context.ProductEssentials.FromSqlRaw("exec get_Products").ToListAsync();
+
+    //result.ForEach(e =>
+    //{
+    //    Console.WriteLine($"{e.Id} => {e.Name} {e.CategoryName} {e.Value}");
+    //});
+
+    //Parametreli sorgu
+    //    create procedure get_ValueProducts
+    //@value nvarchar(max)
+    //as
+    //begin
+    //select p.Id , p.Name, c.Name "CategoryName", pf.Value from Products p
+    //join Categories c on p.CategoryId=c.Id
+    //join ProdcutFeatures pf on pf.Id=p.Id
+    //where pf.Value=@value
+    //end
+    //exec get_ValueProducts "Value 4"
+
+    var res =  context.ProductEssentials.FromSqlInterpolated($"exec get_ValueProducts {"Value 4"}").ToList();
+    res.ForEach(e =>
+    {
+        Console.WriteLine($"{e.Id} => {e.Name} {e.CategoryName} {e.Value}");
     });
 
 }
 
- void _sqlRaw(AppDbContext context)
+void _sqlRaw(AppDbContext context)
 {
     var xdItems =  context.xds.FromSqlRaw("select Name,Price from products").ToList();
     xdItems.ForEach(e =>
@@ -198,14 +300,14 @@ void _indexes (AppDbContext context)
 
     //Selectdeki veriler mesela Nickname özelliği IncludeProperty ile dahil edilmeli.
     //Edilmez ise Index'ın bir anlamı olmaz.Çünkü tabloya bir kez daha sorgu atılır.
-    //context.Authors.Where(x => x.Name=="Author 2").Select(x => new { newName = x.Name, newNickname = x.Nickname });
-    //context.Products.Where(x => x.Name == "Product 4").Select(x=> new
-    //{
-    //    // Bu 3 özellik IncludeProperty ile dahil edildiği için sadece name sorgusu ile bu özellikler de çekilir.
-    //    newName=x.Name,
-    //    newPrice=x.Price,
-    //    newBarcode=x.Barcode
-    //});
+    context.Authors.Where(x => x.Name=="Author 2").Select(x => new { newName = x.Name, newNickname = x.Nickname });
+    context.Products.Where(x => x.Name == "Product 4").Select(x => new
+    {
+        // Bu 3 özellik IncludeProperty ile dahil edildiği için sadece name sorgusu ile bu özellikler de çekilir.
+        newName = x.Name,
+        newPrice = x.Price,
+        newBarcode = x.Barcode
+    });
 
     context.Products.Add(new Product
     {
